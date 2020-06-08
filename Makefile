@@ -4,7 +4,7 @@ OPT = -O2
 LIBPATH = /home/liuke/HPC/hpccourse
 MYLIB = mympi
 LIBMYMPI = libmympi.a
-LIBOBJS = mybegin.o myend.o ring.o
+LIBOBJS = mybegin.o myend.o ring.o datatype.o
 CC = mpicc
 
 mybegin.o: mybegin.c
@@ -15,6 +15,9 @@ myend.o: myend.c
 
 ring.o: ring.c
 		$(CC) -c $(OPT) ring.c
+
+datatype.o: datatype.c
+		$(CC) -c $(OPT) datatype.c
 
 main.o: main.c
 		$(CC) $(OPT) -c main.c
