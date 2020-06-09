@@ -1,36 +1,26 @@
 #Mikefile
 
 OPT = -O2
-LIBPATH = /home/liuke/HPC/hpccourse
+LIBPATH =.
 MYLIB = mympi
 LIBMYMPI = libmympi.a
-LIBOBJS = mybegin.o myend.o ring.o datatype.o mpistruct.o
+LIBOBJS = mybegin.o myend.o ring.o datatype.o mpistruct.o rcmatmul.o
 CC = mpicc
 
-mybegin.o: mybegin.c
-		$(CC) -c $(OPT) mybegin.c
+%.o: %.c
+	$(CC) -c $(OPT) -o $@ $<
 
-myend.o: myend.c
-		$(CC) -c $(OPT) myend.c
-
-ring.o: ring.c
-		$(CC) -c $(OPT) ring.c
-
-datatype.o: datatype.c
-		$(CC) -c $(OPT) datatype.c
-
-mpistruct.o: mpistruct.c
-		$(CC) -c $(OPT) mpistruct.c
-
-main.o: main.c
-		$(CC) $(OPT) -c main.c
-		
-main: main.o
-		$(CC) $(OPT) -o main main.o -L$(LIBPATH) -l$(MYLIB) -lm
+main: main.o mylib
+	$(CC) $(OPT) -o main main.o -L$(LIBPATH) -l$(MYLIB) -lm
+	rm *.o
 		
 #make a library
 mylib: $(LIBOBJS)
 		ar rcs $(LIBMYMPI) $(LIBOBJS)
  
+exam:exam1.c exam2.c
+	$(CC) -o exam1 exam1.c
+	$(CC) -o exam2 exam2.c
+.PHONY = clean
 clean:
-		rm -f *.o *.a a.out main
+		rm -f *.o *.a a.out main exam2 exam1

@@ -13,8 +13,7 @@ char **argv;
 	MPI_Aint sizeabc, extnewtp;
 	int i;
 	
-#define chkstruct
-
+// #define chkstruct
 	// 初始化环境
 	mybegin(&argc, &argv, &comm, &np, &iam);
 
@@ -35,10 +34,12 @@ char **argv;
 			x[m].c[2] = 'C' + 3 * m;
 		}
 		MPI_Send(x, 3, newtp, 1, 5, comm);
-			
+		MPI_Aint lb;
 	//查看所定义类型的信息
 		sizeabc = sizeof(abc);
-		MPI_Type_extent(newtp, &extnewtp);
+		MPI_Type_get_extent(newtp,&lb,&extnewtp);
+
+		// MPI_Type_extent(newtp, &extnewtp);
 		printf("\n iam = %d, sizeof = %ld, and extent = %ld\n", iam, sizeabc, extnewtp);
 	}
 		
@@ -63,6 +64,30 @@ char **argv;
 	MPI_Type_free(&newtp);
 #endif
 
+#define ckrcmatmul
+#ifdef ckrcmatmul
+	float A[1][4];
+	float B[4][1];
+	float C[1][4];
+	float W[4][1];
+	for(int j = 0 ; j < 4 ; j++)
+	{
+		A[0][j] = iam - 1;
+		B[j][0] = iam + 1;
+	}
+
+	printf("A %d row: %f, %f, %f, %f\n",iam,A[0][0],A[0][1],A[0][2],A[0][3]);
+	printf("B %d col: %f, %f, %f, %f\n",iam,B[0][0],B[1][0],B[2][0],B[3][0]);
+
+// void rcmatmul(MPI_Comm comm,int np, int iam,int m, int k,int n,int lda,float a[][lda], int ldb,float b[][ldb],int ldc, float c[][ldc],int ldw, float w[][ldw]){
+	// rcmatmul(comm,np,iam,1,4,1,4,A,1,B,4,C,1,W);
+	
+	MPI_Barrier(comm);
+
+	printf("C %d row: %f, %f, %f, %f\n",iam,C[0][0],C[0][1],C[0][2],C[0][3]);
+
+
+#endif
 
 	// 函数功能实现
 	// m = iam;
