@@ -4,4 +4,5 @@
 ---
 
 - 代码风格:一个头文件站到底，一个main站到底。如果想要添加模块，在main里面添加`#define xxx`
-- 其中exam1.c和exam2.c是考试题
+- 有一些函数是4.0.3才有的,新比如`MPI_Type_get_extent`,`MPI_Get_address`等等，如果报错，参考[新老接口对比](https://www.open-mpi.org/faq/?category=mpi-removed)
+- 其中exam1.c和exam2.c是考试题(当作是纸上写代码了，我不保证不报错)

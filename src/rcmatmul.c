@@ -19,12 +19,13 @@ void init_b(int k, int n,int ldb, float b[][ldb],int iam){
     }
 }
 
-void matmul(int m, int k , int n, int lda, float a[][lda] ,int ldb, float b[][ldb], int ldc, float c[][ldc]){
+void matmul(int m, int k , int n, int lda, float a[][lda] ,int ldb, float b[][ldb], int ldc, float *c){
+    // printf("matmul param m %d k %d n %d lda %d ldb %d ldc %d",m,k,n,lda,ldb,ldc);
     for(int i = 0 ; i < m; i ++){
         for(int j = 0 ;  j < n ; j++){
-            c[i][j] =0;
+            c[i *ldc + j] =0;
             for(int l = 0 ; l < k; l++){
-                c[i][j] += a[i][l] * b[l][j];
+                c[i *ldc + j] += a[i][l] * b[l][j];
             }
         }
     }
@@ -66,6 +67,7 @@ void rcmatmul(MPI_Comm comm,int np, int iam,int m, int k, int n,int lda,float a[
         matmul( m,k,n,lda,a,ldb,b,ldc,&c[0][l]);
     else 
         matmul( m,k,n,lda,a,ldw,w,ldc,&c[0][l]);
+    
     MPI_Type_free( & rectb);
     MPI_Type_free( & rectw);
 }

@@ -62,23 +62,34 @@ char **argv;
 	MPI_Type_free(&newtp);
 #endif
 
-// #define ckrcmatmul
+#define ckrcmatmul
 #ifdef ckrcmatmul
 	float A[1][4];
 	float B[4][1];
 	float C[1][4];
 	float W[4][1];
+	m = 1;
+	const int k = 4;
+	n = 1;
+	const int lda = 4;
+	const int ldb = 1;
+	const int ldc = 4;
+	const int ldw = 1;
 	for(int j = 0 ; j < 4 ; j++)
 	{
-		A[0][j] = iam - 1;
+		A[0][j] = iam + 2;
 		B[j][0] = iam + 1;
 	}
 
 	printf("A %d row: %f, %f, %f, %f\n",iam,A[0][0],A[0][1],A[0][2],A[0][3]);
 	printf("B %d col: %f, %f, %f, %f\n",iam,B[0][0],B[1][0],B[2][0],B[3][0]);
 
+// void rcmatmul(MPI_Comm comm,int np, int iam,int m, int k, int n,int lda,float a[][lda], int ldb,float b[][ldb],int ldc, float c[][ldc],int ldw, float w[][ldw]);
+
+	rcmatmul( comm, np,  iam, m,  k,  n, lda, A,  ldb, B, ldc,  C, ldw,  W);
 	
 	MPI_Barrier(comm);
+	fflush(stdout);
 
 	printf("C %d row: %f, %f, %f, %f\n",iam,C[0][0],C[0][1],C[0][2],C[0][3]);
 
@@ -162,7 +173,7 @@ char **argv;
 
 #endif
 //使用FLOAT_INT符合结构求出最大值以及最大值的位置
-#define ckreduce
+// #define ckreduce
 #ifdef ckreduce
 	typedef struct {float val;int loc;} float_int;
 	float_int data[2], result[2];
