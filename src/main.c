@@ -80,6 +80,7 @@ char **argv;
 	{
 		A[0][j] = iam + 2;
 		B[j][0] = iam + 1;
+		C[0][j] = 0;
 	}
 
 	printf("A %d row: %f, %f, %f, %f\n",iam,A[0][0],A[0][1],A[0][2],A[0][3]);
