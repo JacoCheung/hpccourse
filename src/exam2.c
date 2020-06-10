@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "mpi.h"
 
+//第二问是可以的，用MPI_Type_indexed就行
 void make_newtype(int m, int n, int lda,MPI_Datatype * newtype){
 
     MPI_Datatype vec_type;

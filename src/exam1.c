@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include "mpi.h"
-
+//第二问看不懂
 void mesh( iam,  np, comm, p, q, myrow, mycol, \
            rowcom, colcom )
 int iam, np, p, q, *myrow, *mycol; MPI_Comm comm, *rowcom, *colcom;
@@ -50,11 +50,9 @@ int main(int args, char ** argv){
         a = 100.1;
     }
     else a = -1;
-
     if(row == 0 && col == 0)
         MPI_Bcast(&a,1,MPI_FLOAT,0,row_comm);
     MPI_Barrier(row_comm);
-
     MPI_Bcast(&a,1,MPI_FLOAT,col,col_comm);
 
     MPI_Finalize();
