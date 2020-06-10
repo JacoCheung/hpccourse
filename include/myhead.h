@@ -22,13 +22,21 @@ void datatype(char, MPI_Datatype *);
 
 void mpistruct(MPI_Datatype *);
 
-void init_a(int m, int k, int lda,float a[][lda],int iam);
+void init_a(int m, int k, int lda,float *a ,int iam);
+void init_b(int k, int n,int ldb, float *b,int iam);
 
-void init_b(int k, int n,int ldb, float b[][ldb],int iam);
+void matmul(int m, int k , int n, int lda, float *  ,int ldb, float *b , int ldc, float *c);
 
-void matmul(int m, int k , int n, int lda, float a[][lda] ,int ldb, float b[][ldb], int ldc, float *c);
-
-void rcmatmul(MPI_Comm comm,int np, int iam,int m, int k, int n,int lda,float a[][lda], int ldb,float b[][ldb],int ldc, float c[][ldc],int ldw, float w[][ldw]);
+void rcmatmul(MPI_Comm comm,int np, int iam,int m, int k, int n,int lda,float * a, int ldb,float *b ,int ldc, float *c,int ldw, float *w);
 
 void snglscan(MPI_Comm comm,int np, int iam,int root, float a,float *b);
 
+void typemat( int m, int n, int lda, MPI_Datatype *newtp );
+
+void scopy(int m, int k, float * a, int lda, float *t, int ldt);
+
+void setinitab(int p, int myrow, int mycol, int m, int k, int n, float *a, int lda, float * b, int ldb);
+
+
+void cannon(MPI_Comm rowcom,MPI_Comm colcom,int p, int myrow,int mycol, int m, int k, int n,float *a, int lda,float* b, int ldb, float *c, int ldc, 
+            float* at/*临时存储ab块的空间*/, int ldaw, float* bt, int ldbw);

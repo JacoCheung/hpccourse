@@ -1,6 +1,7 @@
 #include "myhead.h"
 #include <stdlib.h>
-
+#include <assert.h>
+#include "math.h"
 void main(argc, argv)
 int argc;
 char **argv;
@@ -62,7 +63,7 @@ char **argv;
 	MPI_Type_free(&newtp);
 #endif
 
-#define ckrcmatmul
+// #define ckrcmatmul
 #ifdef ckrcmatmul
 	float A[1][4];
 	float B[4][1];
@@ -86,7 +87,7 @@ char **argv;
 
 // void rcmatmul(MPI_Comm comm,int np, int iam,int m, int k, int n,int lda,float a[][lda], int ldb,float b[][ldb],int ldc, float c[][ldc],int ldw, float w[][ldw]);
 
-	rcmatmul( comm, np,  iam, m,  k,  n, lda, A,  ldb, B, ldc,  C, ldw,  W);
+	rcmatmul( comm, np,  iam, m,  k,  n, lda, &A[0][0],  ldb, &B[0][0], ldc,  &C[0][0], ldw,  &W[0][0]);
 	
 	MPI_Barrier(comm);
 	fflush(stdout);
@@ -221,6 +222,74 @@ char **argv;
 	if(iam == np-1)
 	printf("get snglscan result %f\n",b);
 	
+#endif
+
+//这里np只能等于4
+#define ckcannon
+#ifdef ckcannon
+	// void cannon(MPI_Comm rowcom,MPI_Comm colcom,int p, int myrow,int mycol, int m, int k, int n,float *a, int lda,float* b, int ldb, float *c, int ldc, 
+    //         float* at/*临时存储ab块的空间*/, int ldaw, float* bt, int ldbw)
+	MPI_Comm rowcom, colcom;
+	int p,q, myrow, mycol, k, lda, ldb, ldaw,ldc, ldbw;
+	float *a, *b, *c, *at, *bt;
+	m = n = k = 2;
+	ldc = lda = ldb = ldaw = ldbw = 2;
+	myrow ;
+	mycol ; 
+	a = (float * ) malloc(sizeof(float) * m * k);
+	at = (float * ) malloc(sizeof(float) * m * k);
+
+	b = (float * ) malloc(sizeof(float) * n * k);
+	bt = (float * ) malloc(sizeof(float) * n * k);
+
+	c = (float * ) malloc(sizeof(float) * m * n);
+	p = (int)sqrt(np),q = np / 2;
+	assert(p == q);
+	// void mesh( int iam,  int np, MPI_Comm comm, int p, int q, int* myrow, int* mycol, \
+    //        MPI_Comm * rowcom, MPI_Comm *colcom );
+	mesh( iam,  np, comm, p, q, &myrow, &mycol, &rowcom, &colcom );
+	// printf("iam %d , (%d,%d)\n",iam,myrow,mycol);
+	for(int i = 0 ; i < m; i++)
+		for(int j = 0 ; j < n ; j ++){
+			c[i * ldc + j] = 0;
+		}
+
+	setinitab(p, myrow, mycol, m, k, n, a, lda, b, ldb);
+	// printf("proc %d a: \n",iam);
+	// for(int i = 0 ; i < m;i++){
+	// 	for(int j = 0 ; j < k; j++){
+	// 		printf("%f ",a[lda*i + j]);
+
+	// 	}
+	// 	printf("\n");
+	// }
+	fflush(stdout);
+	MPI_Barrier(comm);
+
+	// printf("proc %d b: \n",iam);
+	// for(int i = 0 ; i < k;i++){
+	// 	for(int j = 0 ; j < n; j++){
+	// 		printf("%f ",b[ldb*i+j]);
+
+	// 	}
+	// 	printf("\n");
+	// }
+	// fflush(stdout);
+	MPI_Barrier(comm);
+	cannon(rowcom,colcom,p,myrow,mycol,m,k,n,a,lda,b,ldb,c,ldc,at,ldaw,bt,ldbw);
+	
+	MPI_Barrier(comm);
+
+	printf("proc %d \n",iam);
+	for(int i = 0 ; i < m;i++){
+		for(int j = 0 ; j < n; j++){
+			printf("%f ",c[ldc*i + j]);
+
+		}
+		printf("\n");
+	}
+
+
 #endif
 	// 函数功能实现
 	// m = iam;

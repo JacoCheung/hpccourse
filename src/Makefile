@@ -5,7 +5,7 @@ LIBPATH =../lib
 MYLIB = mympi
 LIBMYMPI = libmympi.a
 # LIBOBJS = ../obj/mybegin.o ../obj/myend.o ../obj/ring.o ../obj/datatype.o ../obj/mpistruct.o ../obj/rcmatmul.o ../obj/mesh.o ../obj/scan.o ../obj/main.o
-LIBOBJS = mybegin.o myend.o ring.o datatype.o mpistruct.o rcmatmul.o mesh.o scan.o main.o
+LIBOBJS = mybegin.o myend.o ring.o datatype.o mpistruct.o rcmatmul.o mesh.o scan.o main.o cannon.o
 
 CC = mpicc
 CFLAG = -I../include
