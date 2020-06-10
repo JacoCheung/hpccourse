@@ -12,12 +12,9 @@ char **argv;
 	MPI_Status st;
 	abc x[10];
 	MPI_Aint sizeabc, extnewtp;
-	int i;
-	
-// #define chkstruct
 	// 初始化环境
 	mybegin(&argc, &argv, &comm, &np, &iam);
-
+// #define chkstruct
 #ifdef chkstruct
 	mpistruct(&newtp);
 	MPI_Type_commit(&newtp);
@@ -165,7 +162,7 @@ char **argv;
 
 #endif
 //使用FLOAT_INT符合结构求出最大值以及最大值的位置
-// #define ckreduce
+#define ckreduce
 #ifdef ckreduce
 	typedef struct {float val;int loc;} float_int;
 	float_int data[2], result[2];
@@ -175,12 +172,23 @@ char **argv;
 	data[1].val = (iam + 1) * 10;
 	data[1].loc = iam;
 
-	MPI_Allreduce(&data,&result,1,MPI_FLOAT_INT,MPI_MAXLOC,comm);
+	MPI_Allreduce(&data,&result,2,MPI_FLOAT_INT,MPI_MAXLOC,comm);
 	printf("from rank %d result is (%f,%d) (%f,%d) \n",iam,result[0].val,result[0].loc,result[1].val,result[1].loc);
+	MPI_Barrier(comm);
+	fflush(stdout);
+	float *sendbuf = (float * )malloc (sizeof(float) * np);
+	float recvbuf = 1;
+	int recvcount[np];
+	for(int i = 0 ; i < np ; i++){
+		sendbuf[i] = i + 1;
+		recvcount[i] = 1;
+	}
+	MPI_Reduce_scatter(sendbuf,&recvbuf,recvcount,MPI_FLOAT,MPI_SUM,comm);
+	printf("proc %d , get reduce result %f\n",iam, recvbuf);
 
 #endif
 
-#define ckmesh
+// #define ckmesh
 #ifdef ckmesh
 	MPI_Comm rowcomm,colcomm;
 	int col,row;
@@ -189,6 +197,20 @@ char **argv;
 	printf("proc %d , (%d,%d)\n",iam,row,col);
 #endif
 
+// #define ckscan
+#ifdef ckscan
+
+	int a[2] = {1,iam};
+	int result[2];
+	MPI_Scan(&a,&result,2,MPI_INT,MPI_SUM,comm);
+	printf("proc %d, scan result (%d,%d)\n",iam,result[0],result[1]);
+	float fa = 1.1 * iam;
+	float b;
+    snglscan( comm, np,  iam, np - 1, fa, &b);
+	if(iam == np-1)
+	printf("get snglscan result %f\n",b);
+	
+#endif
 	// 函数功能实现
 	// m = iam;
 	// ring(m, &n, comm, np, iam);

@@ -29,3 +29,5 @@ void init_b(int k, int n,int ldb, float b[][ldb],int iam);
 void matmul(int m, int k , int n, int lda, float a[][lda] ,int ldb, float b[][ldb], int ldc, float c[][ldc]);
 
 void rcmatmul(MPI_Comm comm,int np, int iam,int m, int k, int n,int lda,float a[][lda], int ldb,float b[][ldb],int ldc, float c[][ldc],int ldw, float w[][ldw]);
+
+void snglscan(MPI_Comm comm,int np, int iam,int root, float a,float *b);
