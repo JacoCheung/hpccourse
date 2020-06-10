@@ -4,7 +4,7 @@ OPT = -O2
 LIBPATH =.
 MYLIB = mympi
 LIBMYMPI = libmympi.a
-LIBOBJS = mybegin.o myend.o ring.o datatype.o mpistruct.o rcmatmul.o
+LIBOBJS = mybegin.o myend.o ring.o datatype.o mpistruct.o rcmatmul.o mesh.o
 CC = mpicc
 
 %.o: %.c

@@ -1,4 +1,5 @@
 
+#include "myhead.h"
 void mesh( iam,  np, comm, p, q, myrow, mycol, \
            rowcom, colcom )
 int iam, np, p, q, *myrow, *mycol; MPI_Comm comm, *rowcom, *colcom;

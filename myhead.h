@@ -10,9 +10,10 @@ typedef struct
 } abc;
 
 void mesh( int iam,  int np, MPI_Comm comm, int p, int q, int* myrow, int* mycol, \
-           MPI_Comm * rowcom, MPI_Comm colcom );
+           MPI_Comm * rowcom, MPI_Comm *colcom );
 
 void mybegin(int *, char***, MPI_Comm*, int*, int*);
+
 void myend();
 
 void ring(int, int *, MPI_Comm, int, int);
