@@ -27,7 +27,7 @@ exam:exam1.c exam2.c
 	$(CC) -o exam1 $(CFLAG) exam1.c
 	$(CC) -o exam2 $(CFLAG) exam2.c
 	@mv exam1 ../bin
-	@mc exam2 ../bin
+	@mv exam2 ../bin
 
 .PHONY = clean
 clean:

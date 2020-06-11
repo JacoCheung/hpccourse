@@ -168,7 +168,6 @@ char **argv;
 	MPI_Alltoall(all_send,1,MPI_2INT,all_recv,1,MPI_2INT,comm);
 	printf("in %d: ",iam);
 	for(int i = 0 ; i < np * 2; i++ ){
-
 		printf("%d ",all_recv[i]);
 	}
 	printf("\n");
@@ -226,7 +225,7 @@ char **argv;
 #endif
 
 //这里np只能等于4
-#define ckcannon
+// #define ckcannon
 #ifdef ckcannon
 	// void cannon(MPI_Comm rowcom,MPI_Comm colcom,int p, int myrow,int mycol, int m, int k, int n,float *a, int lda,float* b, int ldb, float *c, int ldc, 
     //         float* at/*临时存储ab块的空间*/, int ldaw, float* bt, int ldbw)
@@ -244,43 +243,34 @@ char **argv;
 	bt = (float * ) malloc(sizeof(float) * n * k);
 
 	c = (float * ) malloc(sizeof(float) * m * n);
+	//gather all submat to C
+	float * C;
+	if(iam == 0)
+		C = (float * )malloc(sizeof(float) * m * n * np);
+	MPI_Datatype big_type,small_type;
+
+	MPI_Type_vector(m,n,n,MPI_FLOAT,&small_type);
+	MPI_Type_vector(m,n,n*np,MPI_FLOAT,&big_type);
+	MPI_Type_commit(&small_type);
+	MPI_Type_commit(&big_type);
+
+	
 	p = (int)sqrt(np),q = np / 2;
 	assert(p == q);
-	// void mesh( int iam,  int np, MPI_Comm comm, int p, int q, int* myrow, int* mycol, \
-    //        MPI_Comm * rowcom, MPI_Comm *colcom );
 	mesh( iam,  np, comm, p, q, &myrow, &mycol, &rowcom, &colcom );
-	// printf("iam %d , (%d,%d)\n",iam,myrow,mycol);
 	for(int i = 0 ; i < m; i++)
 		for(int j = 0 ; j < n ; j ++){
 			c[i * ldc + j] = 0;
-		}
+	}
 
 	setinitab(p, myrow, mycol, m, k, n, a, lda, b, ldb);
-	// printf("proc %d a: \n",iam);
-	// for(int i = 0 ; i < m;i++){
-	// 	for(int j = 0 ; j < k; j++){
-	// 		printf("%f ",a[lda*i + j]);
 
-	// 	}
-	// 	printf("\n");
-	// }
 	fflush(stdout);
 	MPI_Barrier(comm);
-
-	// printf("proc %d b: \n",iam);
-	// for(int i = 0 ; i < k;i++){
-	// 	for(int j = 0 ; j < n; j++){
-	// 		printf("%f ",b[ldb*i+j]);
-
-	// 	}
-	// 	printf("\n");
-	// }
-	// fflush(stdout);
 	MPI_Barrier(comm);
 	cannon(rowcom,colcom,p,myrow,mycol,m,k,n,a,lda,b,ldb,c,ldc,at,ldaw,bt,ldbw);
-	
-	MPI_Barrier(comm);
 
+	MPI_Barrier(comm);
 	printf("proc %d \n",iam);
 	for(int i = 0 ; i < m;i++){
 		for(int j = 0 ; j < n; j++){
@@ -288,16 +278,54 @@ char **argv;
 
 		}
 		printf("\n");
+
 	}
 
+#endif
+
+#define ckga
+#ifdef ckga
+
+	int a[2][2] = {0,0,1,1};
+	int C[2][4] = {1,2,3,4,5,6,7,8};
+	int C_d = 2;
+	int a_d = 2;
+	MPI_Datatype big_type,small_type;
+	MPI_Status sat;
+
+	MPI_Type_vector(2,2,2,MPI_INT,&small_type);
+	MPI_Type_vector(2,2,4,MPI_INT,&big_type);
+	MPI_Type_commit(&small_type);
+	MPI_Type_commit(&big_type);
+	MPI_Send(a,1,small_type,0,1,comm);
+
+	if(iam == 0){
+		for(int i = 0 ; i < 2; i++){
+			MPI_Recv(&C[0][2 * i],1,big_type,i,1,comm,&st);
+		}
+	}
+	
+	if(iam == 0)
+	for(int i = 0 ; i < 2;i++){
+		for(int j = 0 ; j < 4; j++){
+			printf("%d ",C[i][j]);
+		}
+		printf("\n");
+	}
 
 #endif
-	// 函数功能实现
-	// m = iam;
-	// ring(m, &n, comm, np, iam);
-	// printf("Thread : %d of %d , n = %d\n", np, iam, n);
 
-	// 结束程序
+	
+// if(iam == 0)
+// 	for(int i = 0 ; i < m * np ; i++){
+// 		for(int j = 0 ; j < n * np; j++){
+// 			printf("%f ",C[i * m * np + j]);
+// 		}
+// 		printf("\n");
+// 	}
+
+
+
 	myend();
 
 	return;
