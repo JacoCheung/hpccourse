@@ -6,12 +6,10 @@ void mesh( iam,  np, comm, p, q, myrow, mycol, \
 int iam, np, p, q, *myrow, *mycol; MPI_Comm comm, *rowcom, *colcom;
 {
     int color, key;
-    if( np < p*q ) return;
     if( iam < p*q ) color = iam / q;
     else color = MPI_UNDEFINED;
     key = iam;
     MPI_Comm_split( comm, color, key, rowcom );
-    
     /*column communicator*/
     if( iam < p*q ) color = iam % q;
     else color = MPI_UNDEFINED;
@@ -42,7 +40,6 @@ int main(int args, char ** argv){
     MPI_Comm_size(global_comm,&numprocs);
 
     int row,col;
-
     mesh(myrank,numprocs,global_comm,p,q,&row,&col,&row_comm,&col_comm);
 
     float a;
@@ -50,11 +47,11 @@ int main(int args, char ** argv){
         a = 100.1;
     }
     else a = -1;
-    if(row == 0 && col == 0)
+    if(row == 0)
         MPI_Bcast(&a,1,MPI_FLOAT,0,row_comm);
     MPI_Barrier(row_comm);
-    MPI_Bcast(&a,1,MPI_FLOAT,col,col_comm);
-
+    MPI_Bcast(&a,1,MPI_FLOAT,0,col_comm);
+    printf("my rank: %d, val: %f\n",myrank,a);
     MPI_Finalize();
     return 0;
 }
